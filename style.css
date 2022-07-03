@@ -24,6 +24,9 @@
     border:1px solid orange;
 }
 
+.location.approved{
+    border:5px solid black;
+}
 .cards{
     display:flex;
     flex-direction:row;
@@ -53,3 +56,4 @@
 .selected{
     border:5px solid orange;
 }
+

@@ -10,6 +10,7 @@ const createPlayer = (name) => {
         left: "empty",
         right: "empty"
     }
+    const approved = false;
     const setField = (location, attack) => {
         if (cards[attack] <= 0) {
             console.log("card not in deck")
@@ -26,6 +27,7 @@ const createPlayer = (name) => {
         name: name,
         cards: cards,
         field: field,
+        approved:approved,
         getPoints: getPoints,
         setField: setField,
         addPoints: addPoints
@@ -155,11 +157,11 @@ let handleCardSelection = (player) => (e) => {
 
 
 }
-let handleSubmit = (playerData, left, right) => (e) => {
+let handleApproval = (playerData, left, right) => (e) => {
     //depending on which players submit button was selected
     console.log("player", playerData, left, right)
     e.preventDefault();
-    console.log("submit clicked!", e.target, left, right)
+    console.log("approval clicked!", e.target, left, right)
     let leftCardType = Array.from(left.classList).filter(c => c == "circle" || c == "square" || c == "triangle")[0];
     let rightCardType = Array.from(right.classList).filter(c => c == "circle" || c == "square" || c == "triangle")[0];
     // console.log(Array.from(left.classList).filter(c => c == "circle" || c=="square" || c == "triangle"))
@@ -169,15 +171,54 @@ let handleSubmit = (playerData, left, right) => (e) => {
     if (playerData.cards[leftCardType] > 0 && playerData.cards[leftCardType]) {
         playerData.cards[leftCardType]--;
         playerData.cards[rightCardType]--;
-        //battle current field vs opponent hand
-        gameLoop();
+        //give fields and playerData approve status
+        left.classList.add("approved")
+        right.classList.add("approved")
+        playerData.approved = true;
+        //remove this on round submit
     } else {
         console.log("error Missing either", leftCardType, rightCardType)
     }
     //re render the cards
 
 }
+let handleRoundSubmit = (p1Data, p1Left, p1Right,p2Data, p2Left, p2Right) => (e) => {
+    //depending on which players submit button was selected
+    if(!(p1Data.approved && p2Data.approved)){
+        console.log("ERROR, approval required by both players")
+        return;
+    }
+    console.log("players", p1Data, p1Left, p1Right,p2Data, p2Left, p2Right)
+    e.preventDefault();
+    console.log("round submit clicked!", e.target,)
+    let p1LeftCardType = Array.from(p1Left.classList).filter(c => c == "circle" || c == "square" || c == "triangle")[0];
+    let p1RightCardType = Array.from(p1Right.classList).filter(c => c == "circle" || c == "square" || c == "triangle")[0];
+    
+    let p2LeftCardType = Array.from(p2Left.classList).filter(c => c == "circle" || c == "square" || c == "triangle")[0];
+    let p2RightCardType = Array.from(p2Right.classList).filter(c => c == "circle" || c == "square" || c == "triangle")[0];
+    // console.log(Array.from(left.classList).filter(c => c == "circle" || c=="square" || c == "triangle"))
+    // console.log(Array.from(right.classList).filter(c => c == "circle" || c=="square" || c == "triangle"))
+    //subtract 1 from player cards object
+    console.log("players CardTypes", p1LeftCardType, p1RightCardType, p2LeftCardType, p2RightCardType)
+    //we shouldn't be validating that the opponent HAS the cards here, this can be handled in approvals
+    p1Data.cards[p1LeftCardType]--;
+    p1Data.cards[p1RightCardType]--;
+    
+    p2Data.cards[p2LeftCardType]--;
+    p2Data.cards[p2RightCardType]--;
+    
+    p1Left.classList.remove("approved")
+    p1Right.classList.remove("approved")
+        
+    p2Left.classList.remove("approved")
+    p2Right.classList.remove("approved")
+    
+    p1Data.approved = false;
+    p2Data.approved = false;
+    //battle current field vs opponent hand
+    gameLoop();
 
+}
 //Players
 let name1 = "michael"
 let name2 = "bbeg"
@@ -190,7 +231,7 @@ domPlayer1.div = document.getElementById("player1")
 domPlayer1.deck = domPlayer1.div.getElementsByClassName("cards")[0]
 domPlayer1.left = domPlayer1.div.getElementsByClassName("left")[0]
 domPlayer1.right = domPlayer1.div.getElementsByClassName("right")[0]
-domPlayer1.submit = domPlayer1.div.getElementsByClassName("submit")[0]
+domPlayer1.approval = domPlayer1.div.getElementsByClassName("approval")[0]
 domPlayer1.selectedCard;
 domPlayer1.selectedCardType;
 
@@ -199,21 +240,25 @@ domPlayer2.div = document.getElementById("player2")
 domPlayer2.deck = domPlayer2.div.getElementsByClassName("cards")[0]
 domPlayer2.left = domPlayer2.div.getElementsByClassName("left")[0]
 domPlayer2.right = domPlayer2.div.getElementsByClassName("right")[0]
-domPlayer2.submit = domPlayer2.div.getElementsByClassName("submit")[0]
+domPlayer2.approval = domPlayer2.div.getElementsByClassName("approval")[0]
 domPlayer2.selectedCard;
 domPlayer2.selectedCardType;
 
+//submit round 
+let roundSubmitButton = document.getElementById("round-submit");
 //Assign html players event listeners
 domPlayer1.left.addEventListener("click", handleLocationSelection(domPlayer1, p1))
 domPlayer1.right.addEventListener("click", handleLocationSelection(domPlayer1, p1))
 
-domPlayer1.submit.addEventListener("click", handleSubmit(p1, domPlayer1.left, domPlayer1.right))
+domPlayer1.approval.addEventListener("click", handleApproval(p1, domPlayer1.left, domPlayer1.right))
 
 domPlayer2.left.addEventListener("click", handleLocationSelection(domPlayer2, p2))
 domPlayer2.right.addEventListener("click", handleLocationSelection(domPlayer2, p2))
 
-domPlayer2.submit.addEventListener("click", handleSubmit(p2, domPlayer2.left, domPlayer2.right))
+domPlayer2.approval.addEventListener("click", handleApproval(p2, domPlayer2.left, domPlayer2.right))
 
+//submit round listner
+roundSubmitButton.addEventListener("click",handleRoundSubmit(p1, domPlayer1.left, domPlayer1.right,p2, domPlayer2.left, domPlayer2.right))
 //generate decks based on player data
 let render = (player, playerData) => {
 
@@ -242,3 +287,4 @@ render(domPlayer1, p1);
 render(domPlayer2, p2);
 
 //TODO a global button to submit both fields
+//the current submit event handler will basically be changed to an "approval" check from each player before ending the round
