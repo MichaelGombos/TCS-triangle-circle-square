@@ -69,14 +69,12 @@ const compareCards = (card1,card2) =>{
     }
 }
 
-
-
 const playerBattle = (player1,player2) => {
     //compare the players fields, assign points, then reset.
     console.log("playerBattle",player1.field, player2.field)
-
+    console.log("playerBattle",player1, player2)
     //compare fields to generate the round object
-    let round = compareFields(michael.field,opponent.field)
+    let round = compareFields(player1.field,player2.field)
     
     //Assign the points
     for(let locationScore of round){
@@ -90,8 +88,7 @@ const playerBattle = (player1,player2) => {
             player2.addPoints(1)
         }
     }
-    // console.log("points", player1.getPoints(), player2.getPoints())
-    // console.log("players",player1,player2)
+
     console.log(player1.getPoints(),player2.getPoints())
     // returns a score
 }
@@ -104,17 +101,11 @@ const clearFields = (player1,player2) => {
     player2.setField("right","empty")
 }
 
-let michael = createPlayer("michael");
-let opponent = createPlayer("bbeg");
-
-//placeholder
-opponent.setField("left","square")
-opponent.setField("right","square")
-
-
-
-// playerBattle(michael,opponent)
-
+let name1 = "michael"
+let name2 = "bbeg"
+let p1 = createPlayer(name1);
+let p2 = createPlayer(name2);
+let players = {name1:p1,name2:p2}
 
 const gameLoop = () => {
     //runs one round
@@ -126,35 +117,32 @@ const gameLoop = () => {
         
     }
     
-    playerBattle(michael,opponent)
+    
+    playerBattle(p1,p2)
     gameResults.rounds++;
     
-    console.log("michael.score",michael.getPoints())
-    gameResults.player1Score = michael.getPoints()
-    gameResults.player2Score = opponent.getPoints()
-    
-    render();
+    gameResults.player1Score = p1.getPoints()
+    gameResults.player2Score = p2.getPoints()
+    render(domPlayer1,p1);
+    render(domPlayer2,p2);
     return gameResults;
     
 }
 //need a way to advance the game, add points, go to the next step, and then complete the game 
-let domPlayer1 = document.getElementById("player1")
-let domPlayer1Deck = domPlayer1.getElementsByClassName("cards")[0]
-let domPlayer1Left = domPlayer1.getElementsByClassName("left")[0]
-let domPlayer1Right = domPlayer1.getElementsByClassName("right")[0]
-let domPlayer1Submit = domPlayer1.getElementsByClassName("submit")[0]
-let currentSelectedCard;
-let currentSelectedCardType;
 
-let handleLocationSelection = (e) => {
+//TODO
+let handleLocationSelection = (player,playerData)=> (e) => {
+    //depending on which field was selected 
+    
     let locationSide = Array.from(e.target.classList).filter(c => c == "left" || c =="right")[0]
     //remove other classes
     e.target.classList.remove("triangle","circle","square")
     //set location type to current selected card type
-    if(!!currentSelectedCardType){
-        e.target.classList.add(currentSelectedCardType)
-        console.log("type",currentSelectedCardType)
-        michael.field[locationSide] = currentSelectedCardType;
+    console.log("player.selectedCardType",player)
+    if(!!player.selectedCardType){
+        e.target.classList.add(player.selectedCardType)
+        console.log("type",player.selectedCardType)
+        playerData.field[locationSide] = player.selectedCardType;
     }
     else{
         //if no card is selected let us know
@@ -163,18 +151,24 @@ let handleLocationSelection = (e) => {
     
     //set selected card to none
 }
-let handleCardSelection = (e) => {
-    currentSelectedCard= e.target;
-    currentSelectedCardType = Array.from(e.target.classList).filter(c => c == "triangle" || c =="circle" || c=="square")[0] //use [-data] instaed
+let handleCardSelection = (player) => (e) => {
+    //depending on which players deck was selected using dataset name
+
+        player.selectedCard= e.target;
+        player.selectedCardType = Array.from(e.target.classList).filter(c => c == "triangle" || c =="circle" || c=="square")[0] //use [-data] instaed
+        
+        //remove selected class from other cards
+        for(let domCard of Array.from(player.deck.children)){
+            domCard.classList.remove("selected")
+        }
+        //toggle it on this card
+        player.selectedCard.classList.toggle("selected")
+
     
-    //remove selected class from other cards
-    for(let domCard of Array.from(domPlayer1Deck.children)){
-        domCard.classList.remove("selected")
-    }
-    //toggle it on this card
-    currentSelectedCard.classList.toggle("selected")
 }
-let handleSubmit = (left,right) =>  (e) => {
+let handleSubmit = (playerData,left,right) =>  (e) => {
+    //depending on which players submit button was selected
+    console.log("player",playerData,left,right)
     e.preventDefault();
     console.log("submit clicked!",e.target, left,right)
     let leftCardType = Array.from(left.classList).filter(c => c == "circle" || c=="square" || c == "triangle")[0];
@@ -182,9 +176,10 @@ let handleSubmit = (left,right) =>  (e) => {
     // console.log(Array.from(left.classList).filter(c => c == "circle" || c=="square" || c == "triangle"))
     // console.log(Array.from(right.classList).filter(c => c == "circle" || c=="square" || c == "triangle"))
     //subtract 1 from player cards object
-    if(michael.cards[leftCardType] > 0 && michael.cards[leftCardType]){
-        michael.cards[leftCardType]--;
-        michael.cards[rightCardType]--;
+    console.log("playerCardTypes",leftCardType,rightCardType)
+    if(playerData.cards[leftCardType] > 0 && playerData.cards[leftCardType]){
+        playerData.cards[leftCardType]--;
+        playerData.cards[rightCardType]--;
         //battle current field vs opponent hand
         gameLoop();
     }
@@ -194,32 +189,59 @@ let handleSubmit = (left,right) =>  (e) => {
     //re render the cards
     
 }
-domPlayer1Left.addEventListener("click",handleLocationSelection)
-domPlayer1Right.addEventListener("click",handleLocationSelection)
 
-domPlayer1Submit.addEventListener("click",handleSubmit(domPlayer1Left,domPlayer1Right))
+let domPlayer1={}
+domPlayer1.div = document.getElementById("player1")
+domPlayer1.deck = domPlayer1.div.getElementsByClassName("cards")[0]
+domPlayer1.left = domPlayer1.div.getElementsByClassName("left")[0]
+domPlayer1.right = domPlayer1.div.getElementsByClassName("right")[0]
+domPlayer1.submit = domPlayer1.div.getElementsByClassName("submit")[0]
+domPlayer1.selectedCard;
+domPlayer1.selectedCardType;
+
+let domPlayer2={}
+domPlayer2.div = document.getElementById("player2")
+domPlayer2.deck = domPlayer2.div.getElementsByClassName("cards")[0]
+domPlayer2.left = domPlayer2.div.getElementsByClassName("left")[0]
+domPlayer2.right = domPlayer2.div.getElementsByClassName("right")[0]
+domPlayer2.submit = domPlayer2.div.getElementsByClassName("submit")[0]
+domPlayer2.selectedCard;
+domPlayer2.selectedCardType;
+
+domPlayer1.left.addEventListener("click",handleLocationSelection(domPlayer1,p1))
+domPlayer1.right.addEventListener("click",handleLocationSelection(domPlayer1,p1))
+
+domPlayer1.submit.addEventListener("click",handleSubmit(p1, domPlayer1.left,domPlayer1.right))
+
+domPlayer2.left.addEventListener("click",handleLocationSelection(domPlayer2,p2))
+domPlayer2.right.addEventListener("click",handleLocationSelection(domPlayer2,p2))
+
+domPlayer2.submit.addEventListener("click",handleSubmit(p2, domPlayer2.left,domPlayer2.right))
 
 //generate deck
-let render = () => {
+let render = (player,playerData) => {
     
     //remove all cards
-    while (domPlayer1Deck.firstChild) {
-        domPlayer1Deck.removeChild(domPlayer1Deck.firstChild);
+    while (player.deck.firstChild) {
+        player.deck.removeChild(player.deck.firstChild);
     }
     
     //generate new cards
-    for(let shape in michael.cards){
-    for(let i = 0; i <michael.cards[shape]; i++){
+    for(let shape in playerData.cards){
+    for(let i = 0; i <playerData.cards[shape]; i++){
         let cardDiv = document.createElement("div")
         //add shape to this card
         cardDiv.classList.add(shape)
-        
+        cardDiv.dataset.playerName = playerData.name
         cardDiv.classList.add("card")
         
-        domPlayer1Deck.appendChild(cardDiv)
-        cardDiv.addEventListener("click",handleCardSelection)
+        player.deck.appendChild(cardDiv)
+        cardDiv.addEventListener("click",handleCardSelection(player))
     }
 }
 }
 
-render();
+render(domPlayer1,p1);
+render(domPlayer2,p2);
+
+//need a global button to submit both fields

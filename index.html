@@ -12,17 +12,28 @@
 </head>
 
 <body>
-
-  <p>This game is played in the console. Right click on this page and select "inspect"</p>
+  <!-- allows to submit both fields <button id="round-submit">Submit Round</button>-->
   <div class="player" id="player1">
     <h1 class="name">Player1</h1>
-    <div class="cards"></div>
+    <div class="player1-cards cards"></div>
     <form class="menu">
       <div class="field">
         <div class="location left"></div>
         <div class="location right"></div>
       </div>
-      <button class="submit">Submit Field</button>
+      <button id="player1-submit" class="submit">Submit Field</button>
+    </form>
+  </div>
+  
+  <div class="player" id="player2">
+    <h1 class="name">Player2</h1>
+    <div class="player2-cards cards"></div>
+    <form class="menu">
+      <div class="field">
+        <div class="location left"></div>
+        <div class="location right"></div>
+      </div>
+      <button id="player2-submit" class="submit">Submit Field</button>
     </form>
   </div>
   <script src="game.js"></script>
