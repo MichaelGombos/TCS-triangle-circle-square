@@ -1,4 +1,6 @@
 const createPlayer = (name) => {
+    let cpuControlled = false;
+    let myTurn = false;
     let points = 0;
     const cards = {
         triangle: 4,
@@ -24,6 +26,8 @@ const createPlayer = (name) => {
     }
     const getPoints = () => points;
     return {
+        myTurn:myTurn,
+        cpuControlled:cpuControlled,
         name: name,
         cards: cards,
         field: field,
@@ -109,7 +113,7 @@ const gameLoop = () => {
 
     }
 
-
+    console.log("battle")
     playerBattle(p1, p2)
     gameResults.rounds++;
 
@@ -120,10 +124,34 @@ const gameLoop = () => {
     return gameResults;
 
 }
-//need a way to advance the game, add points, go to the next step, and then complete the game 
+
+//generate random number
+function getRandomInt(max) {
+  return Math.floor(Math.random() * max);
+}
+//generate choice for cpu
+const generateChoice = (playerData) =>{
+    let validCards = [];
+    let choice;
+    
+    for(let card in playerData.cards){
+        console.log(card)
+        
+        if(playerData.cards[card] > 0){
+            validCards.push(card)
+        }
+    }
+    //generate choice
+    console.log(validCards)
+    choice = validCards[getRandomInt(validCards.length)]
+    playerData.cards[choice]--;
+    
+    
+    return choice;
+}
 
 //Event Handlers
-let handleLocationSelection = (player, playerData) => (e) => {
+const handleLocationSelection = (player, playerData) => (e) => {
     //depending on which field was selected 
 
     let locationSide = Array.from(e.target.classList).filter(c => c == "left" || c == "right")[0]
@@ -142,7 +170,7 @@ let handleLocationSelection = (player, playerData) => (e) => {
 
     //set selected card to none
 }
-let handleCardSelection = (player) => (e) => {
+const handleCardSelection = (player) => (e) => {
     //depending on which players deck was selected using dataset name
 
     player.selectedCard = e.target;
@@ -157,7 +185,7 @@ let handleCardSelection = (player) => (e) => {
 
 
 }
-let handleApproval = (playerData, left, right) => (e) => {
+const handleApproval = (playerData, left, right) => (e) => {
     //depending on which players submit button was selected
     console.log("player", playerData, left, right)
     e.preventDefault();
@@ -182,8 +210,46 @@ let handleApproval = (playerData, left, right) => (e) => {
     //re render the cards
 
 }
-let handleRoundSubmit = (p1Data, p1Left, p1Right,p2Data, p2Left, p2Right) => (e) => {
-    //depending on which players submit button was selected
+const handleRoundSubmit = (p1Data, p1Left, p1Right,p2Data, p2Left, p2Right) => (e) => {
+    //check if p2 is controlled by a CPU. 
+    if(p2Data.cpuControlled && p1Data.approved){
+        //generate p2Data computer choices based on its current deck
+        console.log()
+        
+        console.log("p1 and bot p2", p1Data, p1Left, p1Right,p2Data, p2Left, p2Right)
+        e.preventDefault();
+        console.log("round submit clicked against bot!", e.target,)
+        let p1LeftCardType = Array.from(p1Left.classList).filter(c => c == "circle" || c == "square" || c == "triangle")[0];
+        let p1RightCardType = Array.from(p1Right.classList).filter(c => c == "circle" || c == "square" || c == "triangle")[0];
+        
+        let p2LeftCardType =  generateChoice(p2Data)
+        let p2RightCardType =  generateChoice(p2Data)
+        
+        p2Data.field["left"] = p2LeftCardType;
+        p2Data.field["right"] = p2RightCardType;
+        
+        p2Left.classList.remove("triangle", "circle", "square")
+        p2Right.classList.remove("triangle", "circle", "square")
+        
+        p2Left.classList.add(p2LeftCardType)
+        p2Right.classList.add(p2RightCardType)
+        //handle location selection for p2
+        
+        console.log(p2LeftCardType,p2RightCardType)
+        
+        console.log("players CardTypes", p1LeftCardType, p1RightCardType, p2LeftCardType, p2RightCardType)
+        
+        p1Left.classList.remove("approved")
+        p1Right.classList.remove("approved")
+        
+        p1Data.approved = false;
+    
+        gameLoop();
+        
+        return;
+    }
+
+    //confirm both players approved
     if(!(p1Data.approved && p2Data.approved)){
         console.log("ERROR, approval required by both players")
         return;
@@ -200,7 +266,7 @@ let handleRoundSubmit = (p1Data, p1Left, p1Right,p2Data, p2Left, p2Right) => (e)
     // console.log(Array.from(right.classList).filter(c => c == "circle" || c=="square" || c == "triangle"))
     //subtract 1 from player cards object
     console.log("players CardTypes", p1LeftCardType, p1RightCardType, p2LeftCardType, p2RightCardType)
-    //we shouldn't be validating that the opponent HAS the cards here, this can be handled in approvals
+
     p1Data.cards[p1LeftCardType]--;
     p1Data.cards[p1RightCardType]--;
     
@@ -219,14 +285,25 @@ let handleRoundSubmit = (p1Data, p1Left, p1Right,p2Data, p2Left, p2Right) => (e)
     gameLoop();
 
 }
-//Players
-let name1 = "michael"
-let name2 = "bbeg"
-let p1 = createPlayer(name1);
-let p2 = createPlayer(name2);
+const handleOpponentToggle = (player,playerData) => (e) =>{
+    //this function will toggle the functionality of the
+    //players event listeners,
+    //on player2's turn the cpu will make its choice,
+    //for now this is random
+    player.cpuControlled = e.target.checked;
+    console.log(player.name," cpuControlled", player.cpuControlled )
+    //we can use this cpuControlled check in other event listener functions
+}
+//Players 
+const name1 = "michael"
+const name2 = "bbeg"
+const p1 = createPlayer(name1);
+const p2 = createPlayer(name2);
+
+p1.myTurn = true;
 
 //Html Players
-let domPlayer1 = {}
+const domPlayer1 = {}
 domPlayer1.div = document.getElementById("player1")
 domPlayer1.deck = domPlayer1.div.getElementsByClassName("cards")[0]
 domPlayer1.left = domPlayer1.div.getElementsByClassName("left")[0]
@@ -235,7 +312,7 @@ domPlayer1.approval = domPlayer1.div.getElementsByClassName("approval")[0]
 domPlayer1.selectedCard;
 domPlayer1.selectedCardType;
 
-let domPlayer2 = {}
+const domPlayer2 = {}
 domPlayer2.div = document.getElementById("player2")
 domPlayer2.deck = domPlayer2.div.getElementsByClassName("cards")[0]
 domPlayer2.left = domPlayer2.div.getElementsByClassName("left")[0]
@@ -245,7 +322,9 @@ domPlayer2.selectedCard;
 domPlayer2.selectedCardType;
 
 //submit round 
-let roundSubmitButton = document.getElementById("round-submit");
+const roundSubmitButton = document.getElementById("round-submit");
+//toggle cpu player
+const toggleOpponentBox = document.getElementById("toggle-cpu");
 //Assign html players event listeners
 domPlayer1.left.addEventListener("click", handleLocationSelection(domPlayer1, p1))
 domPlayer1.right.addEventListener("click", handleLocationSelection(domPlayer1, p1))
@@ -259,8 +338,10 @@ domPlayer2.approval.addEventListener("click", handleApproval(p2, domPlayer2.left
 
 //submit round listner
 roundSubmitButton.addEventListener("click",handleRoundSubmit(p1, domPlayer1.left, domPlayer1.right,p2, domPlayer2.left, domPlayer2.right))
+//toggle players listener
+toggleOpponentBox.addEventListener("click",handleOpponentToggle(p2,domPlayer2))
 //generate decks based on player data
-let render = (player, playerData) => {
+const render = (player, playerData) => {
 
     //remove all cards
     while (player.deck.firstChild) {
