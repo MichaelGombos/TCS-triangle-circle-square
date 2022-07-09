@@ -9,37 +9,80 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <link href="style.css" rel="stylesheet">
+  <!--google fonts-->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+
 </head>
 
 <body>
-  <button id="round-submit" class="submit">Submit Round</button>
-  
-  <input type="checkbox" id="toggle-cpu" name="toggle-cpu" defaultValue="yes" >  
-  <label for="toggle-cpu"> Toggle p2 bot </label>
-
-  <div class="player" id="player1">
-    <h1 class="name">Player1</h1>
-    <div class="player1-cards cards"></div>
-    <form class="menu">
-      <div class="field">
-        <div class="location left"></div>
-        <div class="location right"></div>
+  <header>
+    <nav>
+      <img id="logo" src="assets/logo.svg">
+      <div class="links">
+        <a href="#">Rules</a>
+        <a href="#">View Repository</a>
       </div>
-      <button id="player1-approval" class="approval">Approve Field</button>
-    </form>
-  </div>
+    </nav>
+  </header>
+  <section class="content-wrapper">
+    <h1>TCS Cards</h1>
+    <div class="players">
+    <div class="player" id="player1">
+      <h2 class="name">Player1</h1>
+      <p>Points <span id="player1-points">0</span></p>
+      <div class="player1-cards cards"></div>
+      <form class="menu">
+        <div class="field">
+          <div class="location left">L</div>
+          <div class="location right">R</div>
+        </div>
+        <button id="player1-approval" class="approval">Approve Field</button>
+      </form>
+    </div>
   
-  <div class="player" id="player2">
-    <h1 class="name">Player2</h1>
-    <div class="player2-cards cards"></div>
-    <form class="menu">
-      <div class="field">
-        <div class="location left"></div>
-        <div class="location right"></div>
-      </div>
-      <button id="player2-approval" class="approval">Approve Field</button>
-    </form>
+    <div class="player" id="player2">
+      <h2 class="name">Player2</h1>
+      <p>Points <span id="player2-points">0</span></p>
+      <div class="player2-cards cards"></div>
+      <form class="menu">
+        <div class="field">
+          <div class="location left">L</div>
+          <div class="location right">R</div>
+        </div>
+        <button id="player2-approval" class="approval">Approve Field</button>
+      </form>
+    </div>
   </div>
+    <div id="game-menu">
+      <h2>Winner: <span id="winner-text">Undecided</span></h2>
+      <div id="toggle-cpu-button">
+        <label > 
+          <input type="checkbox" id="toggle-cpu" name="toggle-cpu"> <span>Toggle CPU p2</span>
+        </label>
+      </div>
+      <!--<button id="reset-game" class="circle">Reset Game</button>-->
+      <button id="round-submit" class="submit">Submit Round</button>
+    </div>
+    <div id="rules">
+      <h2>Rules:</h2>
+      <ul>
+        <li>Each Player Begins with 12 cards</li>
+        <li>The two The two players can set cards down in two slots, left and right.</li>
+        <li>Square cards defeat Circle cards</li>
+        <li>Circle cards defeat Triangle cards</li>
+        <li>Triangle cards defeat Square cards</li>
+        <li>The player with the most points at the end of the game wins</li>
+      </ul>
+    </div>
+  </section>
+  
+  <footer>
+    <div class="links">
+        <a href="#">Back To Top</a>
+      </div>
+  </footer>
   <script src="game.js"></script>
 </body>
 

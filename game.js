@@ -351,9 +351,10 @@ const render = (player, playerData) => {
     //generate new cards
     for (let shape in playerData.cards) {
         for (let i = 0; i < playerData.cards[shape]; i++) {
-            let cardDiv = document.createElement("div")
+            let cardDiv = document.createElement("img")
             //add shape to this card
             cardDiv.classList.add(shape)
+            cardDiv.src = `assets/${shape}-card.svg`;
             cardDiv.dataset.playerName = playerData.name
             cardDiv.classList.add("card")
 
