@@ -189,6 +189,7 @@ const handleApproval = (playerData, left, right) => (e) => {
     //depending on which players submit button was selected
     console.log("player", playerData, left, right)
     e.preventDefault();
+    
     console.log("approval clicked!", e.target, left, right)
     let leftCardType = Array.from(left.classList).filter(c => c == "circle" || c == "square" || c == "triangle")[0];
     let rightCardType = Array.from(right.classList).filter(c => c == "circle" || c == "square" || c == "triangle")[0];
@@ -203,6 +204,7 @@ const handleApproval = (playerData, left, right) => (e) => {
         //give fields and playerData approve status
         left.classList.add("approved")
         right.classList.add("approved")
+        e.target.innerText="Approved"
         playerData.approved = true;
         //remove this on round submit
     } else {
@@ -231,18 +233,15 @@ const handleRoundSubmit = (p1Data, p1Left, p1Right,p2Data, p2Left, p2Right) => (
         
         p2Left.classList.remove("triangle", "circle", "square")
         p2Right.classList.remove("triangle", "circle", "square")
-        
-        p2Left.classList.add(p2LeftCardType)
-        p2Right.classList.add(p2RightCardType)
-        //handle location selection for p2
+    
         
         console.log(p2LeftCardType,p2RightCardType)
         
         console.log("players CardTypes", p1LeftCardType, p1RightCardType, p2LeftCardType, p2RightCardType)
         
-        p1Left.classList.remove("approved")
-        p1Right.classList.remove("approved")
-        
+        p1Left.classList.remove("approved","triangle","circle","square")
+        p1Right.classList.remove("approved","triangle","circle","square")
+        domPlayer1.approval.innerText="Approve Field"
         p1Data.approved = false;
     
         gameLoop();
@@ -273,12 +272,13 @@ const handleRoundSubmit = (p1Data, p1Left, p1Right,p2Data, p2Left, p2Right) => (
     
     // p2Data.cards[p2LeftCardType]--;
     // p2Data.cards[p2RightCardType]--;
+    p1Left.classList.remove("approved","triangle","circle","square")
+    p1Right.classList.remove("approved","triangle","circle","square")
+    domPlayer1.approval.innerText="Approve Field"
     
-    p1Left.classList.remove("approved")
-    p1Right.classList.remove("approved")
-        
-    p2Left.classList.remove("approved")
-    p2Right.classList.remove("approved")
+    p2Left.classList.remove("approved","triangle","circle","square")
+    p2Right.classList.remove("approved","triangle","circle","square")
+    domPlayer2.approval.innerText="Approve Field"
     
     p1Data.approved = false;
     p2Data.approved = false;
@@ -317,6 +317,7 @@ p1.myTurn = true;
 //Html Players
 const domPlayer1 = {}
 domPlayer1.div = document.getElementById("player1")
+domPlayer1.points = domPlayer1.div.getElementsByClassName("points")[0]
 domPlayer1.deck = domPlayer1.div.getElementsByClassName("cards")[0]
 domPlayer1.left = domPlayer1.div.getElementsByClassName("left")[0]
 domPlayer1.right = domPlayer1.div.getElementsByClassName("right")[0]
@@ -326,6 +327,7 @@ domPlayer1.selectedCardType;
 
 const domPlayer2 = {}
 domPlayer2.div = document.getElementById("player2")
+domPlayer2.points = domPlayer2.div.getElementsByClassName("points")[0]
 domPlayer2.deck = domPlayer2.div.getElementsByClassName("cards")[0]
 domPlayer2.left = domPlayer2.div.getElementsByClassName("left")[0]
 domPlayer2.right = domPlayer2.div.getElementsByClassName("right")[0]
@@ -355,7 +357,9 @@ toggleOpponentBox.addEventListener("click",handleOpponentToggle(p2,domPlayer2))
 resetGameButton.addEventListener("click",handleGameReset(domPlayer1,p1,domPlayer2,p2))
 //generate decks based on player data
 const render = (player, playerData) => {
-
+    //Set points for player
+    player.points.innerHTML = playerData.getPoints();
+    
     //remove all cards
     while (player.deck.firstChild) {
         player.deck.removeChild(player.deck.firstChild);
@@ -373,6 +377,21 @@ const render = (player, playerData) => {
 
             player.deck.appendChild(cardDiv)
             cardDiv.addEventListener("click", handleCardSelection(player))
+        }
+    }
+    const winnerText = document.getElementById("winner-text")
+    //that both players cards = 0 to print a winner
+
+    if(player.deck.childElementCount == 0){
+        console.log("Game over")
+        if(p1.getPoints() > p2.getPoints()){
+            winnerText.innerHTML = "Player1"
+        }
+        if(p1.getPoints() < p2.getPoints()){
+            winnerText.innerHTML = "Player2"
+        }
+         if(p1.getPoints() < p2.getPoints()){
+            winnerText.innerHTML = "Draw"
         }
     }
 }

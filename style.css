@@ -180,8 +180,32 @@ button{
 }
 
 .location.approved{
-    border:5px solid black;
+    border:5px solid rgba(0,0,0,.1);
+    background-color: var(--menu-alt-dark);
 }
+.location.triangle{
+    border:5px solid var(--primary-green);
+    background-color:var(--menu-alt-dark);;
+}
+.location.square{
+    border:5px solid var(--primary-blue);
+    background-color:var(--menu-alt-dark);;
+}
+.location.circle{
+    border:5px solid var(--primary-red);
+    background-color:var(--menu-alt-dark);;
+}
+
+.location.triangle.approved{
+    background-color:var(--primary-green);
+}
+.location.square.approved{
+    background-color:var(--primary-blue);
+}
+.location.circle.approved{
+    background-color:var(--primary-red);
+}
+
 .cards{
     width:400px;
     height:200px;
@@ -196,6 +220,7 @@ button{
     border-radius:5px;
     margin:auto;
 }
+
 .triangle{
     background-color:var(--primary-green);
 }
@@ -207,9 +232,8 @@ button{
 .circle{
     background-color:var(--primary-red);;
 }
-#player1 .selected{
-    border:2px solid black;
-}
+
+    
 .selected{
     border:2px solid black;
 }
