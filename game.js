@@ -196,9 +196,10 @@ const handleApproval = (playerData, left, right) => (e) => {
     // console.log(Array.from(right.classList).filter(c => c == "circle" || c=="square" || c == "triangle"))
     //subtract 1 from player cards object
     console.log("playerCardTypes", leftCardType, rightCardType)
-    if (playerData.cards[leftCardType] > 0 && playerData.cards[leftCardType]) {
+    if (playerData.cards[leftCardType] > 0 && playerData.cards[rightCardType] >0) {
         playerData.cards[leftCardType]--;
         playerData.cards[rightCardType]--;
+        console.log(`subtraction ${leftCardType} ${rightCardType} from player ${playerData.name}`)
         //give fields and playerData approve status
         left.classList.add("approved")
         right.classList.add("approved")
@@ -267,11 +268,11 @@ const handleRoundSubmit = (p1Data, p1Left, p1Right,p2Data, p2Left, p2Right) => (
     //subtract 1 from player cards object
     console.log("players CardTypes", p1LeftCardType, p1RightCardType, p2LeftCardType, p2RightCardType)
 
-    p1Data.cards[p1LeftCardType]--;
-    p1Data.cards[p1RightCardType]--;
+    // p1Data.cards[p1LeftCardType]--;
+    // p1Data.cards[p1RightCardType]--;
     
-    p2Data.cards[p2LeftCardType]--;
-    p2Data.cards[p2RightCardType]--;
+    // p2Data.cards[p2LeftCardType]--;
+    // p2Data.cards[p2RightCardType]--;
     
     p1Left.classList.remove("approved")
     p1Right.classList.remove("approved")
@@ -293,6 +294,17 @@ const handleOpponentToggle = (player,playerData) => (e) =>{
     player.cpuControlled = e.target.checked;
     console.log(player.name," cpuControlled", player.cpuControlled )
     //we can use this cpuControlled check in other event listener functions
+}
+const handleGameReset = (p1,p1Data,p2,p2Data) => (e) =>{
+    //reset players
+    console.log("reset game")
+    
+    p1Data = createPlayer(name1);
+    p2Data = createPlayer(name2);
+    
+    render(p1,p1Data)
+    render(p2,p2Data)
+    //re render game
 }
 //Players 
 const name1 = "michael"
@@ -321,10 +333,6 @@ domPlayer2.approval = domPlayer2.div.getElementsByClassName("approval")[0]
 domPlayer2.selectedCard;
 domPlayer2.selectedCardType;
 
-//submit round 
-const roundSubmitButton = document.getElementById("round-submit");
-//toggle cpu player
-const toggleOpponentBox = document.getElementById("toggle-cpu");
 //Assign html players event listeners
 domPlayer1.left.addEventListener("click", handleLocationSelection(domPlayer1, p1))
 domPlayer1.right.addEventListener("click", handleLocationSelection(domPlayer1, p1))
@@ -336,10 +344,15 @@ domPlayer2.right.addEventListener("click", handleLocationSelection(domPlayer2, p
 
 domPlayer2.approval.addEventListener("click", handleApproval(p2, domPlayer2.left, domPlayer2.right))
 
-//submit round listner
-roundSubmitButton.addEventListener("click",handleRoundSubmit(p1, domPlayer1.left, domPlayer1.right,p2, domPlayer2.left, domPlayer2.right))
-//toggle players listener
+//Menu Buttons 
+const submitRoundButton = document.getElementById("round-submit");
+const toggleOpponentBox = document.getElementById("cpu-toggle");
+const resetGameButton = document.getElementById("game-reset");
+
+//Menu Button Listeners
+submitRoundButton.addEventListener("click",handleRoundSubmit(p1, domPlayer1.left, domPlayer1.right,p2, domPlayer2.left, domPlayer2.right))
 toggleOpponentBox.addEventListener("click",handleOpponentToggle(p2,domPlayer2))
+resetGameButton.addEventListener("click",handleGameReset(domPlayer1,p1,domPlayer2,p2))
 //generate decks based on player data
 const render = (player, playerData) => {
 

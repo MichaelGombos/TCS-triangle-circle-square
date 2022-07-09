@@ -118,7 +118,7 @@ button#round-submit{
 
 
 /*TOGGLE CPU BUTTON*/
-#toggle-cpu-button {
+#cpu-toggle-button {
     color:white;
     background-color:var(--primary-blue);
     border:none;
@@ -130,29 +130,29 @@ button#round-submit{
     
     
 }
-#toggle-cpu{
+#cpu-toggle{
     display:none;
 }
-#toggle-cpu-button:hover {
+#cpu-toggle-button:hover {
     background:red;
 }
 
-#toggle-cpu-button label {
+#cpu-toggle-button label {
     
 }
 
-#toggle-cpu-button label span {
+#cpu-toggle-button label span {
     text-align:center;
     display:block;
     padding:10px 24px;
 }
 
-#toggle-cpu-button label input {
+#cpu-toggle-button label input {
     position:relative;
     top:-120px;
 }
 
-#toggle-cpu-button input:checked + span {
+#cpu-toggle-button input:checked + span {
     background-color:#911;
 }
 /*END OF TOGGLE CPU*/
